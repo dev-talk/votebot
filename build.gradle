@@ -1,0 +1,42 @@
+plugins {
+    id 'java'
+    id 'maven'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '2.0.4'
+}
+
+group = 'net.dev_talk'
+version = '1.0-SNAPSHOT'
+mainClassName = 'net.dev_talk.votebot.core.Launcher'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+}
+
+compileJava {
+    options.encoding = 'UTF-8'
+    classpath = sourceSets.main.compileClasspath
+}
+
+shadowJar {
+    classifier = 'withDependencies'
+}
+
+build {
+    dependsOn clean
+    dependsOn jar
+    dependsOn shadowJar
+
+    jar.mustRunAfter clean
+    shadowJar.mustRunAfter jar
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.7'
+}
