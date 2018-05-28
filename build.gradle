@@ -14,9 +14,13 @@ targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
+    compile 'com.google.code.gson:gson:2.8.5'
+    compile 'ch.qos.logback:logback-classic:1.2.3'
+    compile 'net.dv8tion:JDA:3.6.0_367'
 }
 
 compileJava {
