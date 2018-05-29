@@ -2,6 +2,7 @@
   "discord": {
     "token": "INSERT-TOKEN-HERE",
     "activity": "",
-    "activityType": "PLAYING"
+    "activityType": "PLAYING",
+    "embedColor": "#2980b9"
   }
 }

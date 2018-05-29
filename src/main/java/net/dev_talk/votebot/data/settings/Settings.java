@@ -14,6 +14,7 @@ public class Settings {
         private String token;
         private String activity;
         private String activityType;
+        private String embedColor;
 
         public String getToken() {
             return token;
@@ -25,6 +26,10 @@ public class Settings {
 
         public String getActivityType() {
             return activityType;
+        }
+
+        public String getEmbedColor() {
+            return embedColor;
         }
     }
 }

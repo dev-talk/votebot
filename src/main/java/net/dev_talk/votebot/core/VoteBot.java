@@ -3,14 +3,17 @@ package net.dev_talk.votebot.core;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.dev_talk.votebot.data.settings.Settings;
+import net.dev_talk.votebot.util.MessageUtil;
 import net.dev_talk.votebot.util.ResourceUtil;
 import net.dv8tion.jda.core.AccountType;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.entities.Game;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -24,9 +27,11 @@ public class VoteBot implements AutoCloseable {
 
     private static final String DEFAULT_RESOURCES_FOLDER = "defaults";
     private static final String SETTINGS_FILE_NAME = "/settings.json";
+    private static final String MESSAGES_FILE_NAME = "/messages.properties";
 
     private boolean initialized = false;
     private Settings settings = null;
+    private MessageUtil messageUtil = null;
     private JDA discordApi = null;
 
     /**
@@ -60,9 +65,23 @@ public class VoteBot implements AutoCloseable {
             settings = gson.fromJson(reader, Settings.class);
         }
 
+        final Settings.Discord discordSettings = settings.getDiscordSettings();
+
+        final EmbedBuilder embedBuilder = new EmbedBuilder();
+        final String embedColor = discordSettings == null ? null : discordSettings.getEmbedColor();
+        if (embedColor != null && !embedColor.isEmpty()) {
+            try {
+                embedBuilder.setColor(Color.decode(settings.getDiscordSettings().getEmbedColor()));
+            } catch (final NumberFormatException exc) {
+                logger.error("Can't parse embed color! Using no color!", exc);
+            }
+        }
+
+        messageUtil = new MessageUtil(new File(workingDir.concat(MESSAGES_FILE_NAME)),
+                DEFAULT_RESOURCES_FOLDER.concat(MESSAGES_FILE_NAME), embedBuilder);
+
         final JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT);
         jdaBuilder.setEnableShutdownHook(false);
-        final Settings.Discord discordSettings = settings.getDiscordSettings();
         jdaBuilder.setToken(discordSettings == null ? null : discordSettings.getToken());
         final String activity = discordSettings == null ? null : discordSettings.getActivity();
         if (activity != null && !activity.isEmpty()) {
@@ -81,5 +100,9 @@ public class VoteBot implements AutoCloseable {
         if (discordApi != null) {
             discordApi.shutdownNow();
         }
+    }
+
+    public MessageUtil getMessageUtil() {
+        return messageUtil;
     }
 }
