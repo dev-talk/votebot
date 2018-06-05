@@ -2,9 +2,6 @@ package net.dev_talk.votebot.util;
 
 import java.io.*;
 
-/**
- * @author LGA1151 (https://github.com/LGA1151)
- */
 public class ResourceUtil {
     private static final int BUFFER_SIZE = 4096;
 

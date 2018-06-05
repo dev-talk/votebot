@@ -3,9 +3,6 @@ package net.dev_talk.votebot.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author LGA1151 (https://github.com/LGA1151)
- */
 public class Launcher {
     private static final Logger logger = LoggerFactory.getLogger(Launcher.class);
 

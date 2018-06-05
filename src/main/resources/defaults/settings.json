@@ -2,7 +2,15 @@
   "discord": {
     "token": "INSERT-TOKEN-HERE",
     "activity": "",
-    "activityType": "PLAYING",
+    "activityType": "DEFAULT",
     "embedColor": "#2980b9"
+  },
+  "vote": {
+    "channelName": "voting",
+    "silentIdentifier": "silent",
+    "yesEmoji": "white_check_mark",
+    "noEmoji": "negative_squared_cross_mark",
+    "evaluateEmoji": "timer_clock",
+    "deleteEmoji": "x"
   }
 }

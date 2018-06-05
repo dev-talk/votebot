@@ -11,8 +11,8 @@ public class MessageUtil {
     private final EmbedBuilder embedBuilder;
 
     /**
-     * Constructs a new message-util.
-     * It is used to get messages from the provided file with a indentifier key.
+     * Constructs a new MessageUtil.
+     * It is used to get messages from the provided file with an identifier-key.
      *
      * @param messageFile         File where the messages are located
      * @param defaultResourcePath Relative path where the default resource is located
@@ -36,11 +36,12 @@ public class MessageUtil {
         return new EmbedBuilder(embedBuilder);
     }
 
-    public Optional<String> getMessage(final String key) {
-        return Optional.ofNullable(properties.getProperty(key));
+    public Optional<String> getMessage(final String key, final Object... arguments) {
+        final String message = properties.getProperty(key);
+        return message == null ? Optional.empty() : Optional.of(String.format(message, arguments));
     }
 
-    public String getMessageOrKey(final String key) {
-        return getMessage(key).orElse(key);
+    public String getMessageOrKey(final String key, final Object... arguments) {
+        return getMessage(key, arguments).orElse(key);
     }
 }
