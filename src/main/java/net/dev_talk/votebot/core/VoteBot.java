@@ -70,7 +70,12 @@ public class VoteBot implements AutoCloseable {
 
         final JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT);
         jdaBuilder.setEnableShutdownHook(false); //shutting down jda is already done by our shutdown hook
-        jdaBuilder.setToken(discordSettings == null ? null : discordSettings.getToken());
+        String tokenEnv = null;
+        try {
+            tokenEnv = System.getenv("DISCORD_TOKEN");
+        } catch (final SecurityException ignored) {
+        }
+        jdaBuilder.setToken(tokenEnv == null ? discordSettings == null ? null : discordSettings.getToken() : tokenEnv);
         final String activity = discordSettings == null ? null : discordSettings.getActivity();
         if (activity != null && !activity.isEmpty()) {
             final String activityType = discordSettings.getActivityType();
