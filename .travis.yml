@@ -7,7 +7,7 @@ jdk:
 os:
   - linux
 
-before_script:
+before_install:
   - chmod a+x ./gradlew
 
 script:
