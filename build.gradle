@@ -1,13 +1,25 @@
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.4"
+    }
+}
+
 plugins {
     id 'java'
     id 'maven'
     id 'application'
-    id 'com.github.johnrengelman.shadow' version '2.0.4'
 }
+
+mainClassName = 'net.dev_talk.votebot.core.Launcher'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 group = 'net.dev_talk'
 version = '1.0-SNAPSHOT'
-mainClassName = 'net.dev_talk.votebot.core.Launcher'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -20,7 +32,7 @@ repositories {
 dependencies {
     compile 'com.google.code.gson:gson:2.8.5'
     compile 'ch.qos.logback:logback-classic:1.2.3'
-    compile 'net.dv8tion:JDA:3.6.0_367'
+    compile 'net.dv8tion:JDA:3.7.1_392'
     compile 'com.vdurmont:emoji-java:4.0.0'
 }
 
@@ -42,6 +54,6 @@ build {
     shadowJar.mustRunAfter jar
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.7'
+wrapper {
+    gradleVersion = '4.9'
 }
