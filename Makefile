@@ -43,8 +43,7 @@ deps:
 
 # build docker image
 build:
-	@docker build $(DOCKER_CACHE) --rm=true $(DOCKER_TAGS)
-	-f Dockerfile .
+	@docker build $(DOCKER_CACHE) --rm=true $(DOCKER_TAGS) -f Dockerfile .
 
 # build the docker image
 docker: build
