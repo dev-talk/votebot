@@ -11,8 +11,7 @@ public class MessageUtil {
     private final EmbedBuilder embedBuilder;
 
     /**
-     * Constructs a new MessageUtil.
-     * It is used to get messages from the provided file with an identifier-key.
+     * Constructs a new MessageUtil. It is used to get messages from the provided file with an identifier-key.
      *
      * @param messageFile         File where the messages are located
      * @param defaultResourcePath Relative path where the default resource is located

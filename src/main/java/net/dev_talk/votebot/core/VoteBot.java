@@ -6,7 +6,6 @@ import net.dev_talk.votebot.data.settings.Settings;
 import net.dev_talk.votebot.data.vote.VoteDataHandler;
 import net.dev_talk.votebot.handler.VoteHandler;
 import net.dev_talk.votebot.util.MessageUtil;
-import net.dev_talk.votebot.util.ResourceUtil;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
@@ -16,10 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.Reader;
+import java.io.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -29,7 +25,9 @@ public class VoteBot implements AutoCloseable {
     private static final String DEFAULT_RESOURCES_FOLDER = "defaults";
     private static final String SETTINGS_FILE_NAME = "/settings.json";
     private static final String MESSAGES_FILE_NAME = "/messages.properties";
-    private static final String DATA_FILE_NAME = "/data.json";
+
+    private static final String DATA_FOLDER_NAME = "/data";
+    private static final String VOTE_DATA_FILE_NAME = "/data.json";
 
     private boolean initialized = false;
     private JDA discordApi = null;
@@ -37,8 +35,7 @@ public class VoteBot implements AutoCloseable {
     private VoteDataHandler voteDataHandler = null;
 
     /**
-     * Initializes the bot.
-     * This method must be executed to use this bot and can only be executed once!
+     * Initializes the bot. This method must be executed to use this bot and can only be executed once!
      *
      * @throws Exception Exception thrown while initializing
      */
@@ -50,33 +47,27 @@ public class VoteBot implements AutoCloseable {
 
         final long startTimeMillis = System.currentTimeMillis();
 
-        final String workingDir = System.getProperty("user.dir");
-
-        final File settingsFile = new File(workingDir.concat(SETTINGS_FILE_NAME));
-        if (ResourceUtil.saveDefaultResource(getClass().getClassLoader(),
-                DEFAULT_RESOURCES_FOLDER.concat(SETTINGS_FILE_NAME), settingsFile)) {
-            logger.info("Default settings.json saved");
-            logger.info("Make sure to insert your discord-bot-token in the settings!");
-        }
+        final String dataDir = System.getProperty("user.dir").concat(DATA_FOLDER_NAME);
+        new File(dataDir).mkdirs();
 
         final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         final Settings settings;
-        try (final Reader reader = new BufferedReader(new FileReader(settingsFile))) {
-            settings = gson.fromJson(reader, Settings.class);
+
+        try (final InputStream inputStream =
+                     getClass().getClassLoader()
+                             .getResourceAsStream(DEFAULT_RESOURCES_FOLDER.concat(SETTINGS_FILE_NAME));
+             final Reader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+            final Settings defaultValues = gson.fromJson(reader, Settings.class);
+            settings = new Settings(defaultValues); //get settings from env-vars, use default values from resources
         }
 
         final Settings.Discord discordSettings = settings.getDiscordSettings();
 
         final JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT);
         jdaBuilder.setEnableShutdownHook(false); //shutting down jda is already done by our shutdown hook
-        String tokenEnv = null;
-        try {
-            tokenEnv = System.getenv("DISCORD_TOKEN");
-        } catch (final SecurityException ignored) {
-        }
-        jdaBuilder.setToken(tokenEnv == null ? discordSettings == null ? null : discordSettings.getToken() : tokenEnv);
-        final String activity = discordSettings == null ? null : discordSettings.getActivity();
+        jdaBuilder.setToken(discordSettings.getToken());
+        final String activity = discordSettings.getActivity();
         if (activity != null && !activity.isEmpty()) {
             final String activityType = discordSettings.getActivityType();
             Game.GameType gameType = Game.GameType.DEFAULT;
@@ -89,10 +80,10 @@ public class VoteBot implements AutoCloseable {
             }
             jdaBuilder.setGame(Game.of(gameType, activity));
         }
-        discordApi = jdaBuilder.buildBlocking();
+        discordApi = jdaBuilder.build().awaitReady();
 
         final EmbedBuilder embedBuilder = new EmbedBuilder();
-        final String embedColor = discordSettings == null ? null : discordSettings.getEmbedColor();
+        final String embedColor = discordSettings.getEmbedColor();
         if (embedColor != null && !embedColor.isEmpty()) {
             try {
                 embedBuilder.setColor(Color.decode(settings.getDiscordSettings().getEmbedColor()));
@@ -101,12 +92,12 @@ public class VoteBot implements AutoCloseable {
             }
         }
 
-        final MessageUtil messageUtil = new MessageUtil(new File(workingDir.concat(MESSAGES_FILE_NAME)),
+        final MessageUtil messageUtil = new MessageUtil(new File(dataDir.concat(MESSAGES_FILE_NAME)),
                 DEFAULT_RESOURCES_FOLDER.concat(MESSAGES_FILE_NAME), embedBuilder);
 
         executorService = Executors.newCachedThreadPool();
 
-        voteDataHandler = new VoteDataHandler(gson, new File(workingDir.concat(DATA_FILE_NAME)), executorService);
+        voteDataHandler = new VoteDataHandler(gson, new File(dataDir.concat(VOTE_DATA_FILE_NAME)), executorService);
         final Settings.Vote voteSettings = settings.getVoteSettings();
         discordApi.addEventListener(new VoteHandler(this, messageUtil, voteDataHandler,
                 voteSettings.getChannelName(), voteSettings.getSilentIdentifier(), voteSettings.getYesEmoji(),

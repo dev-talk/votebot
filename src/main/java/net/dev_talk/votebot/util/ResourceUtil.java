@@ -7,8 +7,8 @@ public class ResourceUtil {
 
     /**
      * Saves the resource from the provided classloader located in the provided resource-path to the destination file.
-     * If the destination file exists, the method won't overwrite it.
-     * If it doesn't exist, parent directories and the destination file are created by the method.
+     * If the destination file exists, the method won't overwrite it. If it doesn't exist, parent directories and the
+     * destination file are created by the method.
      *
      * @param classLoader  Classloader to get the resource from
      * @param resourcePath Relative path of the resource
