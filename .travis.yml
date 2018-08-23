@@ -1,14 +1,14 @@
-language: java
-sudo: false
+language: go
 
-jdk:
-  - oraclejdk8
+go:
+  - 1.9.x
 
-os:
-  - linux
-
-before_install:
-  - chmod a+x ./gradlew
-
+env:
+  global:
+  - REPO: $TRAVIS_REPO_SLUG
+  - VERSION: $TRAVIS_TAG
+ 
 script:
-  - ./gradlew build
+- make docker
+- docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" quay.io
+- make upload
