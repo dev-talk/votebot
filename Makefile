@@ -23,8 +23,6 @@ DOCKER_TAGS := -t $(REGISTRY)/$(IMAGE):$(VERSION) -t $(REGISTRY)/$(IMAGE):latest
 
 -include .env
 
-include helpers/make_version
-
 .PHONY: build
 
 ### MAIN STEPS ###
