@@ -6,6 +6,8 @@ WORKDIR /mnt
 RUN chmod +x ./gradlew
 RUN ./gradlew
 
+CMD ["/bin/bash"]
+
 FROM openjdk:10-jdk-slim
 
 LABEL maintainer PlayNet <docker@play-net.org>
