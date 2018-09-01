@@ -1,18 +1,12 @@
-FROM openjdk:11-jdk as builder
+FROM openjdk:11-jre-slim as builder
+WORKDIR /app
+COPY . /app
+RUN ["/bin/sh", "gradlew", "--no-daemon" ,"copyDependencies"]
 
-ADD ./ /mnt
-WORKDIR /mnt
-
-RUN chmod +x ./gradlew
-RUN ./gradlew
-
-CMD ["/bin/bash"]
-
-FROM openjdk:10-jdk-slim
-
-LABEL maintainer PlayNet <docker@play-net.org>
-LABEL type "public"
-
-COPY --from=builder /mnt/build/libs/votebot-1.0-SNAPSHOT-withDependencies.jar votebot.jar
-
-ENTRYPOINT ["java", "-jar", "-Xms256M", "-Xmx256M", "votebot.jar"]
+FROM openjdk:11-jre-slim
+LABEL maintainer="docker@play-net.org"
+WORKDIR /app
+VOLUME /app/logs/
+COPY --from=builder app/build/dependencies dependencies
+COPY --from=builder app/build/resources/main* /app/build/classes/java/main* classes/
+CMD ["java", "-XX:+ExitOnOutOfMemoryError", "-Djava.security.egd=file:/dev/./urandom" ,"-cp", "dependencies/*:classes", "net.dev_talk.votebot.core.Launcher"]
