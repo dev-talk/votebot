@@ -40,7 +40,7 @@ artifacts {
     archives shadowJar
 }
 
-wrapper.gradleVersion = '4.9'
+wrapper.gradleVersion = '4.10'
 
 task copyDependencies(type: Copy, dependsOn: classes) {
     from project.configurations.runtimeClasspath

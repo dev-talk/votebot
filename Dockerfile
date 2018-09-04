@@ -1,12 +1,13 @@
-FROM openjdk:11-jre-slim as builder
+FROM gradle:4.10-alpine AS builder
 WORKDIR /app
-COPY . /app
-RUN ["/bin/sh", "gradlew", "--no-daemon" ,"copyDependencies"]
+COPY . .
+USER root
+RUN ["gradle", "--no-daemon" ,"copyDependencies"]
 
-FROM openjdk:11-jre-slim
+FROM openjdk:10-jre-slim
 LABEL maintainer="docker@play-net.org"
 WORKDIR /app
-VOLUME /app/logs/
+VOLUME /app/data/
 COPY --from=builder app/build/dependencies dependencies
 COPY --from=builder app/build/resources/main* /app/build/classes/java/main* classes/
 CMD ["java", "-XX:+ExitOnOutOfMemoryError", "-Djava.security.egd=file:/dev/./urandom" ,"-cp", "dependencies/*:classes", "net.dev_talk.votebot.core.Launcher"]
