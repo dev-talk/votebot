@@ -28,8 +28,7 @@ public class VoteDataHandler extends JsonDataHandler {
     private final JsonArray votesJsonArray;
 
     /**
-     * Constructs a new VoteDataHandler.
-     * The changes made are automatically saved all 10 minutes.
+     * Constructs a new VoteDataHandler. The changes made are automatically saved all 10 minutes.
      *
      * @param gson            Gson instance to use for interacting with the json object.
      * @param jsonFile        Json-File to read from and write to
@@ -37,7 +36,8 @@ public class VoteDataHandler extends JsonDataHandler {
      *
      * @throws IOException Exception while creating the file
      */
-    public VoteDataHandler(final Gson gson, final File jsonFile, final ExecutorService executorService) throws IOException {
+    public VoteDataHandler(final Gson gson, final File jsonFile, final ExecutorService executorService)
+            throws IOException {
         super(gson, jsonFile);
         voteCache = new HashSet<>();
 
@@ -55,7 +55,8 @@ public class VoteDataHandler extends JsonDataHandler {
                 try {
                     writeChanges();
                 } catch (final IOException exc) {
-                    logger.error(String.format("Encountered exception while writing changes to data file %s!", file), exc);
+                    logger.error(String.format("Encountered exception while writing changes to data file %s!", file),
+                            exc);
                 }
                 LockSupport.parkNanos(TimeUnit.MINUTES.toNanos(WRITE_CHANGES_PERIOD_MINUTES)); //block this thread
             }
@@ -63,8 +64,7 @@ public class VoteDataHandler extends JsonDataHandler {
     }
 
     /**
-     * Gets the lock for interacting with the vote data.
-     * Make sure to unlock the lock in a finally block!
+     * Gets the lock for interacting with the vote data. Make sure to unlock the lock in a finally block!
      *
      * @return {@link ReentrantLock} to lock on
      */
