@@ -4,7 +4,7 @@ COPY . .
 USER root
 RUN ["gradle", "--no-daemon" ,"copyDependencies"]
 
-FROM openjdk:10-jre-slim
+FROM openjdk:8-jre-alpine
 LABEL maintainer="docker@play-net.org"
 WORKDIR /app
 VOLUME /app/data/
